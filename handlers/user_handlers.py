@@ -11,6 +11,7 @@ from filters.filters import IsDelNoteCallbackData, IsEditNoteCallbackData
 from keyboards.keyboards_builder import (static_keyboard,
                                          list_of_note_keyboard,
                                          creating_a_note_keyboard,
+                                         chose_notes_for_group_keyboard,
                                          note_keyboard,
                                          cansel_keyboard,
                                          delete_notes_keyboard)
@@ -33,6 +34,7 @@ class FSMFillForm(StatesGroup):
     send_doc = State()
     attach_note = State()
     fill_title_group = State()
+    chose_notes_for_group = State()
     chose_note = State()
     chose_group_notes = State()
     edit_note = State()
@@ -46,7 +48,7 @@ class FSMFillForm(StatesGroup):
 async def process_start_command(message: Message):
     await message.answer(LEXICON[message.text], 
                          reply_markup=static_keyboard())
-    if message.from_user not in users_db:
+    if message.from_user.id not in users_db:
         users_db[message.from_user.id] = deepcopy(user_dict_template)
 
 @router.message(Command(commands='help'), StateFilter(default_state))
@@ -174,7 +176,7 @@ async def send_doc_for_note(message: Message, state: FSMContext):
     await state.set_state(FSMFillForm.select_add)
 
 @router.message(StateFilter(FSMFillForm.send_doc))
-async def warning_file(message: Message):
+async def warning_doc(message: Message):
     await message.answer(
         text=LEXICON['warning_doc'],
         reply_markup=cansel_keyboard())
@@ -202,9 +204,58 @@ async def process_complete_creating(callback: CallbackQuery, state: FSMContext):
 
 
 
-@router.message(Command(commands='create_group'))
-async def process_create_group_command(message: Message):
+@router.message(Command(commands='create_group'), StateFilter(default_state))
+async def process_create_group_command(message: Message, state: FSMContext):
     await message.answer(LEXICON[message.text])
+    await state.set_state(FSMFillForm.fill_title_group)
+
+@router.message(StateFilter(FSMFillForm.fill_title_group), F.text)
+async def input_title_for_group(message: Message, state: FSMContext):
+    await state.update_data(title_group_note = message.text)
+    await message.answer(
+        text=LEXICON['chose_notes_for_group'],
+        reply_markup=chose_notes_for_group_keyboard(*users_db[message.from_user.id]['notes'].keys())
+    )
+    await state.set_state(FSMFillForm.chose_group_notes)
+
+@router.callback_query(F.data.endswith('_select_g'), StateFilter(FSMFillForm.chose_group_notes))
+async def process_note_selection(callback: CallbackQuery, state: FSMContext):
+    await callback.answer()
+    group = await state.get_data()
+    group['notes'] = group.get('notes', []) + [callback.data[:-9]]
+    await callback.message.edit_reply_markup(
+        reply_markup=chose_notes_for_group_keyboard(
+            *users_db[callback.from_user.id]['notes'].keys(),
+            chose_note=group['notes'])
+            )
+    await state.set_data(group)
+
+@router.callback_query(F.data.endswith('_del_sel_g'), StateFilter(FSMFillForm.chose_group_notes))
+async def process_note_delete_selection(callback: CallbackQuery, state: FSMContext):
+    await callback.answer()
+    group = await state.get_data()
+    try:
+        group['notes'].remove(callback.data[:-10])
+        await callback.message.edit_reply_markup(
+        reply_markup=chose_notes_for_group_keyboard(
+            *users_db[callback.from_user.id]['notes'].keys(),
+            chose_note=group['notes'])
+            )
+    except: 
+        callback.answer(
+            text=LEXICON['warning_del_note'], 
+            show_alert=True)
+
+    await state.set_data(group)
+
+@router.callback_query(F.data == 'finish_selection', StateFilter(FSMFillForm.chose_group_notes))
+async def process_finish_selection(callback: CallbackQuery, state: FSMContext):
+    await callback.message.edit_text(LEXICON['finish_selection_text'])
+    group = await state.get_data()
+    users_db[callback.from_user.id]['groups'][group['title_group_note']] = group['notes']
+    await state.clear()
+    print(users_db)
+
 
 
 

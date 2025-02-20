@@ -123,3 +123,34 @@ def delete_notes_keyboard(*args: str) -> InlineKeyboardMarkup:
         )
     )
     return kb_builder.as_markup()
+
+def chose_notes_for_group_keyboard(*args: str, chose_note: list[str] = []):
+        # Create a keyboard object
+    kb_builder = InlineKeyboardBuilder()
+    # Fill the keyboard with note buttons
+    for button in args:
+        if button in chose_note:
+            kb_builder.row(InlineKeyboardButton(
+                text=f'✅ {button}',
+                callback_data=f'{button}_del_sel_g',
+            ))
+        else: 
+            kb_builder.row(InlineKeyboardButton(
+                text=button,
+                callback_data=F'{button}_select_g',
+            ))
+    kb_builder.row(
+        InlineKeyboardButton(
+            text=LEXICON_BUTTONS['finish selection'],
+            callback_data='finish_selection'
+        )
+    )       
+    # Add button "Cancel" to the keyboard at the end
+    kb_builder.row(
+        InlineKeyboardButton(
+            text=LEXICON['cansel'],
+            callback_data='cansel'
+        )
+    )
+
+    return kb_builder.as_markup()
