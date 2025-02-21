@@ -12,6 +12,31 @@ def static_keyboard():
         resize_keyboard=True,
         one_time_keyboard=True)
 
+def list_of_group_keyboard(*args: str) -> InlineKeyboardMarkup:
+    # Create a keyboard object
+    kb_builder = InlineKeyboardBuilder()
+    # Fill the keyboard with note buttons
+    for button in args:
+        if button == 'all_notes':
+            kb_builder.row(InlineKeyboardButton(
+                text=LEXICON_BUTTONS['all_notes'],
+                callback_data=f'{button}_select_g',
+        ))
+        else: 
+            kb_builder.row(InlineKeyboardButton(
+                text=button,
+                callback_data=f'{button}_select_g',
+        ))
+    # Add button "Cancel" to the keyboard at the end
+    kb_builder.row(
+        InlineKeyboardButton(
+            text=LEXICON['cansel'],
+            callback_data='cansel'
+        )
+    )
+    
+    return kb_builder.as_markup()
+
 def list_of_note_keyboard(*args: str) -> InlineKeyboardMarkup:
     # Create a keyboard object
     kb_builder = InlineKeyboardBuilder()
@@ -19,7 +44,7 @@ def list_of_note_keyboard(*args: str) -> InlineKeyboardMarkup:
     for button in args:
         kb_builder.row(InlineKeyboardButton(
             text=button,
-            callback_data=button,
+            callback_data=f'{button}_select_n',
         ))
     # Add button "Cancel" to the keyboard at the end
     kb_builder.row(
