@@ -9,6 +9,8 @@ from config_data.config import Config, load_config
 from handlers import other_handlers, user_handlers
 from keyboards.set_menu import set_main_menu
 
+from database.models import async_models_main
+
 
 # Initialize the logger
 logger = logging.getLogger(__name__)
@@ -25,6 +27,10 @@ async def main():
      #Output to console information about the start of the bot launch
      logger.info('Starting bot')
 
+     #Create Databases
+     await async_models_main()
+     logger.info('Starting database')
+
      #loading dataclass Config into variable config
      config: Config = load_config()
 
@@ -36,6 +42,7 @@ async def main():
           token=config.tg_bot.token,
           default= DefaultBotProperties(parse_mode=ParseMode.HTML))
      dp = Dispatcher(storage=storage )
+     logger.info('Initializatein bot')
 
      #Configuring the main menu
      logger.info('Loading main menu')

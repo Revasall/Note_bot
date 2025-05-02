@@ -2,7 +2,7 @@
 
 # Creating a template for filling out a dictionary with users
 user_dict_template = {
-    'groups': {'all_notes': {}}
+    'groups': {'1::all_notes': {}}
 }
 
 note_template = {
