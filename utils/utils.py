@@ -1,0 +1,11 @@
+class CallbackPrefix():
+    NOTE = 'note_'
+    GROUP = 'group_'
+    DEL = 'del_'
+    SELECT = 'select_'
+    EDIT = 'edit_'
+    ADD = 'add_'
+    NOTE_PAGE = 'npage_'
+    GROUP_PAGE = 'gpage_'
+    WALL = 'wall_'
+    CANCEL = 'cancel'

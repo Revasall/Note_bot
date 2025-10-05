@@ -6,7 +6,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from config_data.config import Config, load_config
-from handlers import other_handlers, user_handlers
+from handlers import common_handlers, notes_handlers, group_handlers, other_handlers
 from keyboards.set_menu import set_main_menu
 
 from database.models import async_models_main
@@ -50,7 +50,9 @@ async def main():
 
      # Registering handlers in the dispatcher
      logger.info('Loading handlers into the dispatcher')
-     dp.include_router(user_handlers.router)
+     dp.include_router(common_handlers.router)
+     dp.include_router(notes_handlers.router)
+     dp.include_router(group_handlers.router)
      dp.include_router(other_handlers.router)
 
      #Skipping accumulated updates and starting pooling
