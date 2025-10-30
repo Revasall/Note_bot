@@ -1,8 +1,11 @@
 from sqlalchemy import BigInteger, String, Text, Integer, ForeignKey, ARRAY
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy.ext.asyncio import AsyncAttrs, async_sessionmaker, create_async_engine
+from config_data.config import load_config
 
-engine = create_async_engine(url='postgresql+asyncpg://postgres:123zxc456vbn@localhost:5432/notes_bot')
+config = load_config()
+
+engine = create_async_engine(url=config.database_url)
 
 async_session = async_sessionmaker(engine)
 
