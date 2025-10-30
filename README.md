@@ -47,23 +47,13 @@ The project demonstrates skills in working with bots, asynchronous event process
 Other libraries and technologies used can be found in requirements.txt.
 
 ## Installation and launch
-Downloading the project:
-git clone https://github.com/Revasall/Note_bot.git
-cd Note_bot
-python -m venv .venv
-
-source .venv/bin/activate      # для Linux/macOS
-# или .venv\Scripts\activate   # для Windows
-source .venv/Scripts/activate #для bush
-
-pip install -r requirements.txt
-python main.py
 
 ```git clone https://github.com/Revasall/Note_bot.git```
 
 ```cd Note_bot```
 
 Setting up the environment:
+
 ```python -m venv .venv```
 
 ```
@@ -75,7 +65,9 @@ source .venv/Scripts/activate # for bush
 ```pip install -r requirements.txt```
 
 Create a database in PostgreSQL
+
 Configure the .env file as in .env.example
+
 Request a token from BotFather for the bot and add it to the BOT_TOKEN line in .env
 
 ```python main.py```
